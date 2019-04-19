@@ -1,0 +1,3 @@
+class MatrixNotSquareException extends Exception{
+	
+}

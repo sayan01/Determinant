@@ -1,0 +1,3 @@
+class ZeroOrderException extends Exception{
+	
+}
