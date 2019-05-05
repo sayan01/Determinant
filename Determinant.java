@@ -256,7 +256,7 @@ class Determinant{
 						System.out.print("Value of Second Determinant: "+b.getValue());
 						Determinant res = d.add(b);
 						System.out.print("\nResultant Determinant: \n");	res.display();
-						System.out.print("Value of Resultant Determinant: "+res.getValue());
+						System.out.println("Value of Resultant Determinant: "+res.getValue());
 					default: System.exit(0);
 				}
 			}
