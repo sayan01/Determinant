@@ -27,6 +27,12 @@ class Determinant{
 		order = det.length;
 	}
 
+
+	Determinant(String error)throws CustomException{
+		throw new CustomException(error);
+	}
+
+
 	// Input elements of determinant from user into the determinant
 	// Throws - ZeroOrderException - when current determinant has order = 0
 	void input(){
@@ -41,7 +47,7 @@ class Determinant{
 	// Calculates the value of the current determinant by simple expansion
 	// Throws - ZeroOrderException - if Determinant is of order 0
 	// 		  - MatrixNotSquareException - if determinant is not square
-	double getValue() throws ZeroOrderException, MatrixNotSquareException{
+	double getValue() throws ZeroOrderException, MatrixNotSquareException, CustomException{
 		if(value != null)
 			return Double.parseDouble(value);
 		// else calculate
@@ -61,7 +67,10 @@ class Determinant{
 	// Throws - ZeroOrderException - by Determinant()
 	// 		  - MatrixNotSquareException - by Determinant()
 	// @Param int i, int j - index of element
-	Determinant getMinor(int i_, int j_) throws ZeroOrderException, MatrixNotSquareException{
+	Determinant getMinor(int i_, int j_) throws ZeroOrderException, MatrixNotSquareException, CustomException{
+		if(i_ >= det.length || j_ >= det[i_].length){
+			return new Determinant("Element does not exist in index " + i_ + "," + j_);
+		}
 		double val = 0;
 		double[][] min = new double[order - 1][order - 1];
 		int k = 0;
@@ -80,13 +89,13 @@ class Determinant{
 	}
 	// Gets the value of the cofactor of an element in determinant
 	// @Param int i, int j - index of element
-	double getCofacor(int i,int j) throws ZeroOrderException, MatrixNotSquareException{
+	double getCofacor(int i,int j) throws ZeroOrderException, MatrixNotSquareException, CustomException{
 		int sign = ((i+j)%2 == 0)?1:-1;
 		return  getMinor(i,j).getValue() * sign;
 		// gets the value of minor of that element, then appropiates the sign
 	}
 	// Returns the adjugate determinant of the current determinant (A B C) for (a b c)
-	Determinant getAdjugate() throws ZeroOrderException, MatrixNotSquareException{
+	Determinant getAdjugate() throws ZeroOrderException, MatrixNotSquareException, CustomException{
 		double[][] rv = new double[order][order];
 		for(int i = 0; i < order; i++){
 			for(int j = 0; j < order; j++){
@@ -225,39 +234,45 @@ class Determinant{
 					"3. Adjugate of Determinant\n"+
 					"4. Add with another Determinant");
 				int ch = sc.nextInt();
-				switch(ch){
-					case 1:
-						System.out.print("Enter i,j of the element whose cofactor you want: ");
-						int i = sc.nextInt(); int j = sc.nextInt();
-						Determinant cof = d.getMinor(i,j);
-						int sign = (((i+j)%2==0)?1:-1);
-						System.out.print("Cofactor: \n"+(sign == 1 ?"+":"-")+ " \n");
-						cof.display();
-						System.out.println("\nValue of cofactor: " + d.getCofacor(i,j));
-						break;
-					case 2:
-						System.out.print("Enter i,j of the element whose minor you want: ");
-						int i_ = sc.nextInt(); int j_ = sc.nextInt();
-						Determinant minor = d.getMinor(i_,j_);
-						System.out.print("Minor: \n");
-						minor.display();
-						System.out.println("\nValue of minor: " + minor.getValue());
-						break;
-					case 3:
-						Determinant adj = d.getAdjugate();
-						System.out.print("Adjugate: \n");
-						adj.display();
-						System.out.println("\nValue of Adjugate: " + adj.getValue());
-						break;
-					case 4:
-						System.out.println("Another determinant should also be of order "+ d.order);
-						Determinant b = new Determinant(d.order);
-						System.out.print("Second Determinant: \n");		b.display();
-						System.out.print("Value of Second Determinant: "+b.getValue());
-						Determinant res = d.add(b);
-						System.out.print("\nResultant Determinant: \n");	res.display();
-						System.out.println("Value of Resultant Determinant: "+res.getValue());
-					default: System.exit(0);
+				try{
+					switch(ch){
+						case 1:
+							System.out.print("Enter i,j of the element whose cofactor you want: ");
+							int i = sc.nextInt(); int j = sc.nextInt();
+							Determinant cof = d.getMinor(i,j);
+							int sign = (((i+j)%2==0)?1:-1);
+							System.out.print("Cofactor: \n"+(sign == 1 ?"+":"-")+ " \n");
+							cof.display();
+							System.out.println("\nValue of cofactor: " + d.getCofacor(i,j));
+							break;
+						case 2:
+							System.out.print("Enter i,j of the element whose minor you want: ");
+							int i_ = sc.nextInt(); int j_ = sc.nextInt();
+							Determinant minor = d.getMinor(i_,j_);
+							System.out.print("Minor: \n");
+							minor.display();
+							System.out.println("\nValue of minor: " + minor.getValue());
+							break;
+						case 3:
+							Determinant adj = d.getAdjugate();
+							System.out.print("Adjugate: \n");
+							adj.display();
+							System.out.println("\nValue of Adjugate: " + adj.getValue());
+							break;
+						case 4:
+							System.out.println("Another determinant should also be of order "+ d.order);
+							Determinant b = new Determinant(d.order);
+							System.out.print("Second Determinant: \n");		b.display();
+							System.out.print("Value of Second Determinant: "+b.getValue());
+							Determinant res = d.add(b);
+							System.out.print("\nResultant Determinant: \n");	res.display();
+							System.out.println("Value of Resultant Determinant: "+res.getValue());
+						default: System.exit(0);
+					}
+				}
+				catch(CustomException ce){
+					System.out.println(ce.getMessage());
+					continue;
 				}
 			}
 		}
@@ -274,6 +289,11 @@ class Determinant{
 		catch(UnaddableDeterminantException ude){
 			System.err.println("Error: Determinant is not addable.\n"+ude.getMessage());
 			ude.printStackTrace();
+			System.exit(1);
+		}
+		catch(CustomException ce){
+			System.err.println("Error: "+ce.getMessage());
+			ce.printStackTrace();
 			System.exit(1);
 		}
 	}
